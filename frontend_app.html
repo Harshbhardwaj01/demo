@@ -1,0 +1,110 @@
+<!-- index.html - A basic Frontend interacting with our backend -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Frontend</title>
+    <!-- Using Tailwind CSS for quick, modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4 font-sans">
+    
+    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
+        <h1 class="text-3xl font-bold mb-8 text-slate-800 text-center">Frontend App</h1>
+
+        <!-- Section 1: Testing the GET Request -->
+        <div class="mb-6 p-5 border border-slate-200 rounded-lg bg-slate-50">
+            <h2 class="text-lg font-semibold mb-3 text-slate-700">1. Test GET Request</h2>
+            <p class="text-sm text-slate-500 mb-4">Fetches a simple welcome message and timestamp from the server.</p>
+            
+            <button id="getBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md transition-colors w-full">
+                Fetch Data
+            </button>
+            <p id="getResult" class="mt-4 text-sm hidden font-medium text-center"></p>
+        </div>
+
+        <!-- Section 2: Testing the POST Request -->
+        <div class="p-5 border border-slate-200 rounded-lg bg-slate-50">
+            <h2 class="text-lg font-semibold mb-3 text-slate-700">2. Test POST Request</h2>
+            <p class="text-sm text-slate-500 mb-4">Sends a JSON payload containing your name to the server.</p>
+            
+            <input type="text" id="nameInput" placeholder="Enter your name" class="w-full border border-slate-300 rounded-md px-3 py-2 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow">
+            <button id="postBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 rounded-md transition-colors w-full">
+                Send Data
+            </button>
+            <p id="postResult" class="mt-4 text-sm hidden font-medium text-center"></p>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // The URL where our Node.js backend is running
+        const API_URL = 'http://localhost:3000';
+
+        // --- GET Request Logic ---
+        document.getElementById('getBtn').addEventListener('click', async () => {
+            const resultEl = document.getElementById('getResult');
+            resultEl.classList.remove('hidden');
+            resultEl.textContent = 'Connecting...';
+            resultEl.className = 'mt-4 text-sm font-medium text-center text-blue-600';
+
+            try {
+                // Perform the GET request
+                const response = await fetch(`${API_URL}/api/message`);
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const data = await response.json();
+                
+                // Display the successful response
+                resultEl.innerHTML = `Server says: <strong>"${data.message}"</strong><br>Time: ${new Date(data.timestamp).toLocaleTimeString()}`;
+                resultEl.className = 'mt-4 text-sm font-medium text-center text-emerald-600';
+            } catch (error) {
+                // Handle errors (usually means server.js isn't running)
+                resultEl.textContent = 'Error: Cannot connect. Is server.js running on port 3000?';
+                resultEl.className = 'mt-4 text-sm font-medium text-center text-red-500';
+            }
+        });
+
+        // --- POST Request Logic ---
+        document.getElementById('postBtn').addEventListener('click', async () => {
+            const name = document.getElementById('nameInput').value.trim();
+            const resultEl = document.getElementById('postResult');
+            resultEl.classList.remove('hidden');
+
+            // Validate input on the frontend
+            if (!name) {
+                resultEl.textContent = 'Please enter a name first!';
+                resultEl.className = 'mt-4 text-sm font-medium text-center text-amber-600';
+                return;
+            }
+
+            resultEl.textContent = 'Sending...';
+            resultEl.className = 'mt-4 text-sm font-medium text-center text-blue-600';
+
+            try {
+                // Perform the POST request
+                const response = await fetch(`${API_URL}/api/greet`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json' // Tell the server we are sending JSON
+                    },
+                    body: JSON.stringify({ name: name }) // Convert our data to a JSON string
+                });
+                
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const data = await response.json();
+                
+                // Display the personalized greeting
+                resultEl.textContent = data.greeting;
+                resultEl.className = 'mt-4 text-sm font-medium text-center text-emerald-600';
+            } catch (error) {
+                // Handle errors
+                resultEl.textContent = 'Error: Cannot connect. Is server.js running on port 3000?';
+                resultEl.className = 'mt-4 text-sm font-medium text-center text-red-500';
+            }
+        });
+    </script>
+</body>
+</html>

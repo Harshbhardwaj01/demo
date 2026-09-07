@@ -1,0 +1,13 @@
+{
+  "name": "frontend-backend-demo",
+  "version": "1.0.0",
+  "private": true,
+  "main": "node_js_backend.js",
+  "scripts": {
+    "start": "node node_js_backend.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
+  }
+}
