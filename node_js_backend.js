@@ -4,6 +4,7 @@
 
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 const PORT = 3000;
@@ -13,6 +14,11 @@ const PORT = 3000;
 app.use(cors()); 
 // Parse incoming JSON payloads
 app.use(express.json());
+
+// Serve the frontend from the same origin as the API.
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'frontend_app.html'));
+});
 
 // ---------------------------
 // API ROUTES
